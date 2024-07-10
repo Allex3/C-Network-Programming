@@ -22,8 +22,6 @@ int main(int argc, char *argv[])
 
     int s;
     struct addrinfo hints, *res;
-
-    struct addrinfo hints, *res, *p;
     int status;
     char ipstr[INET6_ADDRSTRLEN];
 
