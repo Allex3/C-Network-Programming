@@ -1,10 +1,8 @@
-
-#include <winsock2.h>
-#include <WS2tcpip.h>
-#include <stdio.h>
-#include <windows.h>
-#include <stdlib.h>
-#include <string.h>
+#include <winsock2.h> //for socket implementation
+#include <WS2tcpip.h> //for addrinfo and all related functions, etc.
+#include <stdio.h> //standard input and output 
+#include <stdlib.h> //for exit()
+#include <string.h> //for memset here, etc.
 
 int main(int argc, char *argv[])
 {
