@@ -1,8 +1,8 @@
 #include <winsock2.h> //for socket implementation
 #include <WS2tcpip.h> //for addrinfo and all related functions, etc.
-#include <stdio.h> //standard input and output 
-#include <stdlib.h> //for exit()
-#include <string.h> //for memset here, etc.
+#include <stdio.h>    //standard input and output
+#include <stdlib.h>   //for exit()
+#include <string.h>   //for memset here, etc.
 
 int main(int argc, char *argv[])
 {
@@ -19,6 +19,9 @@ int main(int argc, char *argv[])
         WSACleanup();
         exit(2);
     }
+
+    int s;
+    struct addrinfo hints, *res;
 
     struct addrinfo hints, *res, *p;
     int status;
