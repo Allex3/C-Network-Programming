@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     }
 
     struct addrinfo hints, *res;
-    int status, s;
+    int status, sockfd;
 
     if (argc != 2)
     {
@@ -74,20 +74,17 @@ int main(int argc, char *argv[])
         printf(" %s: %s\n", ipver, ipstr);
 
         // now let's work a bit with sockets
-        s = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
+        sockfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol);
         // p->ai_family even if it's AF_INET it can be passed for PF_INET because they're the same usually
         // ai_socktype is stream or datagram (SOCK_STREAM or SOCK_DGRAM)
         // ai_protocol is 0 for any, it can be tcp/udp, etc.
-
-        if (s == -1) // error
+        if (sockfd == -1) // error
         {
             fprintf(stderr, "Failure getting a socket\n");
             return 3;
         }
     }
-
     freeaddrinfo(res);
-
     WSACleanup();
     return 0;
 }
