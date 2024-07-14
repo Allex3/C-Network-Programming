@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
         //NOTE: FOR SOME REASON STRLEN() OF IT RETURNS 1 AFTER \0, AS IF IT'S \n COUNTED TOO ??
         if ((numBytesSend = send(sockfd, clientInput, strlen(clientInput)-1, 0)) == -1)
         {
-            perror("recv");
+            fprintf(stderr, "send: %s\n", gai_strerror(WSAGetLastError()));
             exit(1);
         } //because we always "wait" for input with fgets(), exit shouldnt be an issue because it wont be an error
         //because we send everytime something, and if its error its real and should exit
@@ -127,7 +127,12 @@ DWORD WINAPI recvFromServer(LPVOID svsockvoid)
     {
         if ((numBytesRecv = recv(sockfd, buffer, MAXDATASIZE - 1, 0)) == -1)
         {
-            perror("recv");
+            if (WSAGetLastError() == 10054) // forced close (only type of close yet lmao)
+                {
+                    closesocket(sockfd);
+                    return 0;
+                }
+            fprintf(stderr, "recv: %s\n", gai_strerror(WSAGetLastError()));
             continue; //until we get a message
         }
         fromClientNr = buffer[numBytesRecv - 1]; //here is the number of client the way I coded it lmao
@@ -135,4 +140,6 @@ DWORD WINAPI recvFromServer(LPVOID svsockvoid)
         printf("client %c: %s\n", fromClientNr, buffer);
         fflush(stdout);
     }
+    closesocket(sockfd);
+    return 0;
 }

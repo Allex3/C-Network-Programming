@@ -137,8 +137,24 @@ DWORD WINAPI clientHandling(LPVOID clSockfd) // LPVODI is void*
     int numBytesRecv, numBytesSend;
     while (1)
     {
-        if ((numBytesRecv = recv(clSock, recvbuf, MAXDATASIZE-2, 0)) == -1)
+        if ((numBytesRecv = recv(clSock, recvbuf, MAXDATASIZE - 2, 0)) == -1)
         {
+            if (WSAGetLastError() == 10054) // forced close (only type of close yet lmao)
+            {
+                closesocket(clSock); //close the socket
+                //remove it from the client socket stack
+                for (int i=0; i<numberOfClients; i++)
+                    if (clientSockStack[i] == clSock)
+                    {
+                        for (int j=i; j<numberOfClients-1; j++)
+                            clientSockStack[j] = clientSockStack[j+1]; 
+                            //this removes element at position i in the stack
+                            //basically moves all the elements from its right one to the left
+                        numberOfClients--; //one less client    
+                    }
+
+                return 0; // we return the current client's thread and close it's socket
+            }
             fprintf(stderr, "recv: %s\n", gai_strerror(WSAGetLastError()));
             continue;
         }
@@ -146,10 +162,10 @@ DWORD WINAPI clientHandling(LPVOID clSockfd) // LPVODI is void*
         // successfully received something, we send it to ALL the other clients
         printf("Received a message from a client on the chat\n");
         for (int i = 0; i < numberOfClients; i++)
-            if (clientSockStack[i]== clSock)
-                    recvbuf[numBytesRecv] = i+'0'; //put the socket we got it from here
+            if (clientSockStack[i] == clSock)
+                recvbuf[numBytesRecv] = i + '0'; // put the socket we got it from here
 
-        recvbuf[numBytesRecv+1] = '\0'; //end the string
+        recvbuf[numBytesRecv + 1] = '\0'; // end the string
 
         for (int i = 0; i < numberOfClients; i++)
         {
@@ -160,9 +176,7 @@ DWORD WINAPI clientHandling(LPVOID clSockfd) // LPVODI is void*
             }
         }
         printf("Successfully sent the message to the other clients\n");
-
     }
-    return 0;
 }
 
 void *getInAddr(struct sockaddr *sa) // pointer for the IP Address (a struct containing an int), IPv4 or IPv6
