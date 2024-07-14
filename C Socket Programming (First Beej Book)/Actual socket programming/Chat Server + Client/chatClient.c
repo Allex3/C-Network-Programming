@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 
     freeaddrinfo(servInfo); // we won't usei t anymore
 
-    //run a while loop to always check for input to send to the server and to other clients on the chat
+    // run a while loop to always check for input to send to the server and to other clients on the chat
     HANDLE inputThread = CreateThread(NULL, 0, recvFromServer, &sockfd, 0, NULL);
     if (inputThread == NULL)
     {
@@ -93,16 +93,19 @@ int main(int argc, char *argv[])
     while (1)
     {
         fgets(clientInput, sizeof clientInput, stdin);
-        //NOTE: FOR SOME REASON STRLEN() OF IT RETURNS 1 AFTER \0, AS IF IT'S \n COUNTED TOO ??
-        clientInput[strlen(clientInput)-1] = '\0'; //trransform the \n in \0
+        // NOTE: FOR SOME REASON STRLEN() OF IT RETURNS 1 AFTER \0, AS IF IT'S \n COUNTED TOO ??
+        clientInput[strlen(clientInput) - 1] = '\0'; // trransform the \n in \0
         if (strcmp("/close", clientInput) == 0)
+        {
+            closesocket(sockfd);
             exit(0);
+        }
         if ((numBytesSend = send(sockfd, clientInput, strlen(clientInput), 0)) == -1)
         {
             fprintf(stderr, "send: %s\n", gai_strerror(WSAGetLastError()));
             exit(1);
-        } //because we always "wait" for input with fgets(), exit shouldnt be an issue because it wont be an error
-        //because we send everytime something, and if its error its real and should exit
+        } // because we always "wait" for input with fgets(), exit shouldnt be an issue because it wont be an error
+        // because we send everytime something, and if its error its real and should exit
     }
 
     closesocket(sockfd);
@@ -120,10 +123,10 @@ void *getInAddr(struct sockaddr *sa)
 
 DWORD WINAPI recvFromServer(LPVOID svsockvoid)
 {
-    SOCKET *sockfdp = (SOCKET*) svsockvoid;
-    SOCKET sockfd = *sockfdp; //the server socket
-    int numBytesRecv; //bytes of message
-    char buffer[MAXDATASIZE]; //for message recieved
+    SOCKET *sockfdp = (SOCKET *)svsockvoid;
+    SOCKET sockfd = *sockfdp; // the server socket
+    int numBytesRecv;         // bytes of message
+    char buffer[MAXDATASIZE]; // for message recieved
     char fromClientNr;
 
     while (1)
@@ -131,15 +134,15 @@ DWORD WINAPI recvFromServer(LPVOID svsockvoid)
         if ((numBytesRecv = recv(sockfd, buffer, MAXDATASIZE - 1, 0)) == -1)
         {
             if (WSAGetLastError() == 10054) // forced close (only type of close yet lmao)
-                {
-                    closesocket(sockfd);
-                    return 0;
-                }
+            {
+                closesocket(sockfd);
+                return 0;
+            }
             fprintf(stderr, "recv: %s\n", gai_strerror(WSAGetLastError()));
-            continue; //until we get a message
+            continue; // until we get a message
         }
-        fromClientNr = buffer[numBytesRecv - 1]; //here is the number of client the way I coded it lmao
-        buffer[numBytesRecv - 1] = '\0'; //end the string
+        fromClientNr = buffer[numBytesRecv - 1]; // here is the number of client the way I coded it lmao
+        buffer[numBytesRecv - 1] = '\0';         // end the string
         printf("client %c: %s\n", fromClientNr, buffer);
         fflush(stdout);
     }
