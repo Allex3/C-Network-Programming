@@ -94,7 +94,10 @@ int main(int argc, char *argv[])
     {
         fgets(clientInput, sizeof clientInput, stdin);
         //NOTE: FOR SOME REASON STRLEN() OF IT RETURNS 1 AFTER \0, AS IF IT'S \n COUNTED TOO ??
-        if ((numBytesSend = send(sockfd, clientInput, strlen(clientInput)-1, 0)) == -1)
+        clientInput[strlen(clientInput)-1] = '\0'; //trransform the \n in \0
+        if (strcmp("/close", clientInput) == 0)
+            exit(0);
+        if ((numBytesSend = send(sockfd, clientInput, strlen(clientInput), 0)) == -1)
         {
             fprintf(stderr, "send: %s\n", gai_strerror(WSAGetLastError()));
             exit(1);
