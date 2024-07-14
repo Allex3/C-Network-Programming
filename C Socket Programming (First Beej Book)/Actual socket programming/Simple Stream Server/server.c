@@ -111,7 +111,7 @@ int main(void)
         exit(1);
     }
     
-    printf("server: waiting for connections...");
+    printf("server: waiting for connections...\n");
 
     while (1) //main accept() loop
     {
@@ -120,7 +120,6 @@ int main(void)
         clSockfd = accept(sockfd, (struct sockaddr*)&clientAddr, &sin_size);
         if (clSockfd == -1)
         {
-            fprintf(stderr, "accept: %s\n", gai_strerror(WSAGetLastError()));
             continue; //look for another client
         } 
         
