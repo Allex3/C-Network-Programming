@@ -15,7 +15,8 @@
 DWORD WINAPI sendToClient(LPVOID clSockfd) //LPVODI is void* 
 {
     SOCKET* clsockcasted = (SOCKET*) clSockfd; //cast it to pointer of SOCKET
-    if (send(*clsockcasted, "Hello, world!", 13, 0) == -1)
+    SOCKET  clsock = *clsockcasted;
+    if (send(clsock, "Hello, world!", 13, 0) == -1)
         fprintf(stderr, "send: %s\n", gai_strerror(WSAGetLastError()));
 
     closesocket(*clsockcasted); //we close the current client socket cuz we finished with them

@@ -7,7 +7,6 @@
 #include <sys/types.h>
 #include <windows.h>
 
-#define PORT "4200"     // the port client will be connecting to
 #define MAXDATASIZE 200 // max number of bytes we can get at once
 
 void *getInAddr(struct sockaddr *sa);
@@ -36,7 +35,7 @@ int main(int argc, char *argv[])
     struct addrinfo hints, *servInfo, *servAddr;
     char ipstr[INET6_ADDRSTRLEN];
 
-    if (argc != 2)
+    if (argc != 3)
     {
         fprintf(stderr, "usage: client hostname\n");
         exit(1);
@@ -46,7 +45,7 @@ int main(int argc, char *argv[])
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
-    if ((status = getaddrinfo(argv[1], PORT, &hints, &servInfo)) != 0)
+    if ((status = getaddrinfo(argv[1], argv[2], &hints, &servInfo)) != 0)
     {
         fprintf(stderr, "getaddrinfo: ", gai_strerror(status));
         return 1;
