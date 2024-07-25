@@ -16,10 +16,12 @@ DWORD WINAPI sendToClient(LPVOID clSockfd) //LPVODI is void*
 {
     SOCKET* clsockcasted = (SOCKET*) clSockfd; //cast it to pointer of SOCKET
     SOCKET  clsock = *clsockcasted;
-    if (send(clsock, "Hello, world!", 13, 0) == -1)
+
+    char *res = "HTTP/1.1 200 OK\r\n\r\n"; //modified the hello world to test if it works on http
+    //i think it loades INFINITELY cuz i dont have a front end ? welp
+    if (send(clsock, res, strlen(res), 0) == -1)
         fprintf(stderr, "send: %s\n", gai_strerror(WSAGetLastError()));
 
-    closesocket(*clsockcasted); //we close the current client socket cuz we finished with them
     //if closed in main() it woudl close before we could send()
     //i guess this is why people use processes...
     //because they have the same connection mirrored so that risk is not possible
@@ -77,7 +79,7 @@ int main(void)
             continue;
         }
 
-        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) != 0)
+        if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(char)) != 0)
         {
             fprintf(stderr, "setsockopt: %s\n", gai_strerror(WSAGetLastError()));
             exit(1);
